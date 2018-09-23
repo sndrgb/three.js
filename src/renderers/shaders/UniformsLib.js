@@ -140,6 +140,23 @@ var UniformsLib = {
 		spotShadowMap: { value: [] },
 		spotShadowMatrix: { value: [] },
 
+		projectorLights: { value: [], properties: {
+			color: {},
+			position: {},
+			distance: {},
+			decay: {},
+			projectorMatrix: {},
+			uvTransform: {},
+
+ 			shadow: {},
+			shadowBias: {},
+			shadowRadius: {},
+			shadowMapSize: {}
+		} },
+ 		projectorTextures: { value: [] },
+		projectorShadowMap: { value: [] },
+		projectorShadowMatrix: { value: [] },
+
 		pointLights: { value: [], properties: {
 			color: {},
 			position: {},

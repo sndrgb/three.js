@@ -22,6 +22,12 @@
 
 	#endif
 
+	#if NUM_PROJECTOR_LIGHTS > 0
+		for ( int i = 0; i < NUM_PROJECTOR_LIGHTS; i ++ ) {
+			vProjectorShadowCoord[ i ] = projectorShadowMatrix[ i ] * worldPosition;
+		}
+ 	#endif
+
 	#if NUM_POINT_LIGHTS > 0
 
 	#pragma unroll_loop

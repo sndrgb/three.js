@@ -121,6 +121,74 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 #endif
 
 
+#if NUM_PROJECTOR_LIGHTS > 0
+
+struct ProjectorLight {
+		vec3 position;
+		vec3 color;
+		float distance;
+		float decay;
+
+		mat4 projectorMatrix;
+		mat3 uvTransform;
+
+		int shadow;
+		float shadowBias;
+		float shadowRadius;
+		vec2 shadowMapSize;
+	};
+
+	uniform ProjectorLight projectorLights[NUM_PROJECTOR_LIGHTS];
+	uniform sampler2D projectorTextures[NUM_PROJECTOR_LIGHTS];
+
+	void getProjectorDirectLightIrradiance(
+			const in ProjectorLight projectorLight,
+			const in sampler2D projectorTexture,
+			const in GeometricContext geometry,
+			out IncidentLight directLight)
+	{
+
+		vec3 lVector = projectorLight.position - geometry.position;
+		float lightDistance = length( lVector );
+
+		directLight.direction = normalize( lVector );
+
+		vec4 projected = projectorLight.projectorMatrix * vec4( geometry.position, 1.0 );
+		projected = projected / projected.w;
+
+		vec2 projectorUv = 0.5 * projected.xy + vec2( 0.5 );
+		projectorUv = ( projectorLight.uvTransform * vec3( projectorUv, 1.0 ) ).xy;
+
+		directLight.visible = all(bvec3(
+			all( lessThanEqual( projected.xy, vec2( 1.0 ) ) ),
+			all( greaterThanEqual( projected.xy, vec2( -1.0 ) ) ),
+			projected.z >= 0.0
+		));
+
+		if (directLight.visible) {
+
+			vec4 textureColor = texture2D( projectorTexture, projectorUv );
+			directLight.color = projectorLight.color;
+			directLight.color *= textureColor.rgb;
+			directLight.color *= textureColor.a; // attenuate
+
+			directLight.color *= punctualLightIntensityToIrradianceFactor(
+				lightDistance,
+				projectorLight.distance,
+				projectorLight.decay
+			);
+
+		} else {
+
+			directLight.color = vec3( 0.0 );
+
+		}
+
+	}
+
+#endif
+
+
 #if NUM_RECT_AREA_LIGHTS > 0
 
 	struct RectAreaLight {

@@ -179,7 +179,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 			}
 
-			if ( shadow.isSpotLightShadow ) {
+			if ( shadow.isSpotLightShadow || shadow.isProjectorLightShadow ) {
 
 				shadow.update( light );
 
@@ -206,6 +206,11 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 				_lookTarget.setFromMatrixPosition( light.target.matrixWorld );
 				shadowCamera.lookAt( _lookTarget );
+
+				if ( shadow.isProjectorLightShadow ) {
+					shadowCamera.rotateZ( light.rotation.z );
+				}
+				
 				shadowCamera.updateMatrixWorld();
 
 				// compute shadow matrix
